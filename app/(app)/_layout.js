@@ -1,0 +1,44 @@
+import React from 'react';
+import { Tabs } from 'expo-router';
+import { FontAwesome5 } from '@expo/vector-icons';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import { useAuth } from '../../context/authContext';
+import HomeHeaderUserIcon from '../../components/HomeHeaderUserIcon';
+
+export default function _layout() {
+
+  const {user} = useAuth();
+  return (
+    <Tabs screenOptions={{
+      tabBarInactiveTintColor: 'gray',
+      tabBarActiveTintColor: 'black',
+    }}>
+      <Tabs.Screen
+        name='home'
+        options={{
+          tabBarIcon: ({ color, size }) => (<FontAwesome5 name="home" size={size} color={color} />),
+          title: 'Home',
+          headerTitle: `Hello ${user?.username} !` || 'Home',
+          tabBarLabelStyle: {
+            fontSize: hp(1.6),
+            fontWeight: 'bold'
+          },
+          headerRight: () => (
+            <HomeHeaderUserIcon />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='profile'
+        options={{
+          tabBarIcon: ({ color, size }) => (<FontAwesome5 name="user-alt" size={size} color={color} />),
+          title: 'Account',
+          tabBarLabelStyle: {
+            fontSize: hp(1.6),
+            fontWeight: 'bold'
+          },
+        }}
+      />
+    </Tabs>
+  )
+}
