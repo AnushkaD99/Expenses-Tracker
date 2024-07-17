@@ -26,10 +26,12 @@ export default function HomeHeaderUserIcon() {
           <FontAwesome6 name="user-circle" size={hp(4)} color="black" />
         </MenuTrigger>
         <MenuOptions>
-          <MenuOption onSelect={() => router.push('profile')} text='Profile' />
+          <MenuOption onSelect={() => router.push('profile')}>
+            <Text className="text-xl font-semibold pt-1 pl-2">Profile</Text>
+          </MenuOption>
             
           <MenuOption onSelect={() => hadleLogout()} >
-            <Text style={{color: 'red'}}>Log Out</Text>
+            <Text className="text-xl font-semibold pt-1 pl-2 text-red-600">Log Out</Text>
           </MenuOption>
         </MenuOptions>
       </Menu>

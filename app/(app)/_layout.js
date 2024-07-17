@@ -4,6 +4,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useAuth } from '../../context/authContext';
 import HomeHeaderUserIcon from '../../components/HomeHeaderUserIcon';
+import HomeHeaderLeft from '../../components/HomeHeaderLeft';
 
 export default function _layout() {
 
@@ -18,7 +19,7 @@ export default function _layout() {
         options={{
           tabBarIcon: ({ color, size }) => (<FontAwesome5 name="home" size={size} color={color} />),
           title: 'Home',
-          headerTitle: `Hello ${user?.username} !` || 'Home',
+          headerTitle: '',
           tabBarLabelStyle: {
             fontSize: hp(1.6),
             fontWeight: 'bold'
@@ -26,6 +27,9 @@ export default function _layout() {
           headerRight: () => (
             <HomeHeaderUserIcon />
           ),
+          headerLeft: () => (
+            <HomeHeaderLeft />
+          )
         }}
       />
       <Tabs.Screen
