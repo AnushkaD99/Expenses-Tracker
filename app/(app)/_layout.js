@@ -11,7 +11,7 @@ export default function _layout() {
   return (
     <Tabs screenOptions={{
       tabBarInactiveTintColor: 'gray',
-      tabBarActiveTintColor: 'black',
+      tabBarActiveTintColor: '#272727',
     }}>
       <Tabs.Screen
         name='home'
