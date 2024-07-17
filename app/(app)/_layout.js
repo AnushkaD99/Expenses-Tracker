@@ -33,10 +33,10 @@ export default function _layout() {
         }}
       />
       <Tabs.Screen
-        name='account'
+        name='space'
         options={{
           tabBarIcon: ({ color, size }) => (<FontAwesome5 name="wallet" size={size} color={color} />),
-          title: 'Accounts',
+          title: 'Spaces',
           tabBarLabelStyle: {
             fontSize: hp(1.6),
             fontWeight: 'bold'
