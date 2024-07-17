@@ -23,13 +23,15 @@ export default function CreateSpaceModal({modalVisible, setModalVisible}) {
                 spaceName,
                 spaceId,
                 joiningKey,
-                createdBy: userId
+                createdBy: userId,
+                isDeleted: false
             });
 
             // Create the user-space relationship in the "UserSpaces" collection
             await setDoc(doc(db, "userSpaces", `${userId}_${spaceId}`), {
                 userId,
-                spaceId
+                spaceId,
+                isDeleted: false
             });
             return {success: true};
         } catch (error) {
