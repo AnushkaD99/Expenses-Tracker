@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import SpaceCard from '../../components/SpaceCard';
@@ -44,7 +44,7 @@ export default function Space() {
   },[user?.userId])
   
   return (
-    <View  style={{paddingTop: hp(2), paddingHorizontal: wp(5)}} className="flex-1 gap-5">
+    <SafeAreaView  style={{paddingTop: hp(2), paddingHorizontal: wp(5)}} className="flex-1 gap-5">
       <View className="flex-row justify-between">
         <TouchableOpacity
         style={{ height: hp(6.5), backgroundColor: '#4F46E5', borderRadius: 8, justifyContent: 'center', alignItems: 'center', width: wp(40) }}
@@ -62,10 +62,12 @@ export default function Space() {
         </TouchableOpacity>
       </View>
       <Text className="font-bold text-2xl text-black">Space List</Text>
-      {spaces.length ? <SpaceCard spaces={spaces} /> : <Text className="text-center text-xl pt-5">No Spaces Found</Text>}
+      <ScrollView>
+        {spaces.length ? <SpaceCard spaces={spaces} /> : <Text className="text-center text-xl pt-5">No Spaces Found</Text>}
+      </ScrollView>
 
       <CreateSpaceModal modalVisible={createSpaceModalodalVisible} setModalVisible={setCreateSpaceModalVisible}/>
       <JoinSpaceModal modalVisible={joinSpaceModalodalVisible} setModalVisible={setJoinSpaceModalVisible}/>
-    </View>
+    </SafeAreaView>
   )
 }
