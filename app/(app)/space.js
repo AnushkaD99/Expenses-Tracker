@@ -5,8 +5,8 @@ import SpaceCard from '../../components/SpaceCard';
 import CreateSpaceModal from '../../components/CreateSpaceModal';
 import JoinSpaceModal from '../../components/JoinSpaceModal';
 import { useAuth } from '../../context/authContext';
-import { collection, doc, getDoc, onSnapshot, query, where } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+
+import { getSpacesForUser } from '../../helpers/spacesHelper';
 
 
 export default function Space() {
@@ -16,31 +16,9 @@ export default function Space() {
   const [createSpaceModalodalVisible, setCreateSpaceModalVisible] = useState(false);
   const [joinSpaceModalodalVisible, setJoinSpaceModalVisible] = useState(false);
 
-  const getSpacesForUser = (userId) => {
-    try {
-      const userSpacesRef = collection(db, "userSpaces");
-      const q = query(userSpacesRef, where("userId", "==", userId));
-  
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const spacePromises = querySnapshot.docs.map((snapShot) => {
-          const spaceDocRef = doc(db, "spaces", snapShot.data().spaceId);
-          return getDoc(spaceDocRef);
-        });
-  
-        Promise.all(spacePromises).then((spaceDocs) => {
-          const allSpaces = spaceDocs.map((spaceDoc) => spaceDoc.data());
-          setSpaces([...allSpaces]);
-        });
-      });
-  
-      return unsubscribe;
-    } catch (error) {
-      console.log("Error:", error);
-    }
-  };
-  
   useEffect(()=> {
-    getSpacesForUser(user?.userId);
+    const unsubscribe = getSpacesForUser(user?.userId, setSpaces);
+    return unsubscribe;
   },[user?.userId])
   
   return (
