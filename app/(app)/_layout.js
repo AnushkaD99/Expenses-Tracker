@@ -13,7 +13,9 @@ export default function _layout() {
     <Tabs screenOptions={{
       tabBarInactiveTintColor: 'gray',
       tabBarActiveTintColor: '#272727',
-    }}>
+    }}
+    initialRouteName='addTransaction'
+    >
       <Tabs.Screen
         name='home'
         options={{
