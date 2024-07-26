@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Alert, Modal, Text, Pressable, View, TextInput, ActivityIndicator } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Checkbox from 'expo-checkbox';
+import { getUsersForSpace } from '../helpers/usersHelper';
 
 export default function AddPaidByMembersModal({ modalVisible, setModalVisible }) {
     const [loading, setLoading] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [userAmounts, setUserAmounts] = useState({});
+    const [users, setUsers] = useState([]);
 
-    const users = [
-        { name: "Anushka", id: 1 },
-        { name: "Kivi", id: 2 },
-        { name: "Hichcha", id: 3 },
-    ];
+    const spaceId = "Bodima_9278"
+
+    useEffect(()=> {
+        const unsubscribe = getUsersForSpace(spaceId, setUsers);
+        console.log(users);
+        return unsubscribe;
+    },[spaceId, setUsers])
 
     const handleCheckboxChange = (userId) => {
         setSelectedUsers(prevSelectedUsers =>
@@ -27,10 +31,14 @@ export default function AddPaidByMembersModal({ modalVisible, setModalVisible })
     };
 
     const handleSubmit = () => {
-        const paidMembers = selectedUsers.map(userId => ({
-            userId,
-            amount: userAmounts[userId]
-        }));
+        const paidMembers = selectedUsers.map(userId => {
+            const user = users.find(user => user.userId === userId);
+            return {
+                userId,
+                username: user.username,
+                amount: userAmounts[userId]
+            };
+        });
 
         // Handle the paidMembers array here
         console.log(paidMembers);
@@ -52,20 +60,19 @@ export default function AddPaidByMembersModal({ modalVisible, setModalVisible })
                     <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Add Paid By Members</Text>
                     <View style={{ width: wp(80), marginTop: 20 }}>
                         {users.map(user => (
-                            <View key={user.id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                            <View key={user.userId} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                                 <Checkbox
-                                    value={selectedUsers.includes(user.id)}
-                                    onValueChange={() => handleCheckboxChange(user.id)}
-                                    color={'#272727'}
+                                    value={selectedUsers.includes(user.userId)}
+                                    onValueChange={() => handleCheckboxChange(user.userId)}
                                 />
-                                <Text style={{ flex: 1, marginLeft: 10 }}>{user.name}</Text>
+                                <Text style={{ flex: 1, marginLeft: 10 }}>{user.username}</Text>
                                 <TextInput
                                     placeholder="Amount"
-                                    value={userAmounts[user.id] || ''}
-                                    onChangeText={text => handleAmountChange(user.id, text)}
+                                    value={userAmounts[user.userId] || ''}
+                                    onChangeText={text => handleAmountChange(user.userId, text)}
                                     style={{ fontSize: hp(2), backgroundColor: '#f0f0f0', paddingHorizontal: 10, borderRadius: 5, width: wp(30) }}
                                     keyboardType='numeric'
-                                    editable={selectedUsers.includes(user.id)}
+                                    editable={selectedUsers.includes(user.userId)}
                                 />
                             </View>
                         ))}
@@ -74,7 +81,7 @@ export default function AddPaidByMembersModal({ modalVisible, setModalVisible })
                         <Pressable
                             onPress={handleSubmit}
                             style={{ height: hp(6.5), backgroundColor: 'green', borderRadius: 8, justifyContent: 'center', alignItems: 'center', width: wp(38), marginRight: 10 }}>
-                            {loading ? <ActivityIndicator color={'white'} /> : <Text style={{ fontSize: hp(2.2), color: 'white', fontWeight: 'bold' }}>Add</Text>}
+                            {loading ? <ActivityIndicator color={'white'} /> : <Text style={{ fontSize: hp(2.2), color: 'white', fontWeight: 'bold' }}>Create</Text>}
                         </Pressable>
 
                         <Pressable
