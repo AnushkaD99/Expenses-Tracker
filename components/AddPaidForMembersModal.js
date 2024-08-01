@@ -4,7 +4,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import Checkbox from 'expo-checkbox';
 import { getUsersForSpace } from '../helpers/usersHelper';
 
-export default function AddPaidByMembersModal({ modalVisible, setModalVisible, setPaidByMembers }) {
+export default function AddPaidByMembersModal({ modalVisible, setModalVisible, setPaidForMembers }) {
     const [loading, setLoading] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [userAmounts, setUserAmounts] = useState({});
@@ -41,7 +41,7 @@ export default function AddPaidByMembersModal({ modalVisible, setModalVisible, s
         });
 
         // Handle the paidMembers array here
-        setPaidByMembers(paidMembers);
+        setPaidForMembers(paidMembers);
         console.log(paidMembers);
 
         setModalVisible(false);
@@ -58,7 +58,7 @@ export default function AddPaidByMembersModal({ modalVisible, setModalVisible, s
             }}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <View style={{ backgroundColor: 'white', borderRadius: 10, padding: 20, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
-                    <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Add Paid By Members</Text>
+                    <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Add Paid For Members</Text>
                     <View style={{ width: wp(80), marginTop: 20 }}>
                         {users.map(user => (
                             <View key={user.userId} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
