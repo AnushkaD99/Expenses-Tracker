@@ -5,9 +5,11 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import { useAuth } from '../context/authContext';
 import { getSpacesForUser } from '../helpers/spacesHelper';
+import { useSpace } from '../context/spaceContext';
 
 export default function HomeHeaderLeft() {
   const { user } = useAuth();
+  const { selectedSpaceId, setSelectedSpaceId } = useSpace();
   const [spaces, setSpaces] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null); // Initialize with null
 
@@ -19,9 +21,16 @@ export default function HomeHeaderLeft() {
   useEffect(() => {
     // Update selectedAccount when spaces change
     if (spaces.length > 0) {
-      setSelectedAccount(spaces[0].spaceName); // Set to the first space name
+      const initialSpace = spaces.find(space => space.spaceId === selectedSpaceId) || spaces[0];
+      setSelectedAccount(initialSpace.spaceName);
+      setSelectedSpaceId(initialSpace.spaceId);
     }
   }, [spaces]);
+
+  const handleSpaceChange = (spaceName, spaceId) => {
+    setSelectedAccount(spaceName);
+    setSelectedSpaceId(spaceId);
+  };
 
   return (
     <View style={{ paddingLeft: wp(5) }}>
@@ -36,7 +45,7 @@ export default function HomeHeaderLeft() {
         </MenuTrigger>
         <MenuOptions>
           {spaces.map((space, index) => (
-            <MenuOption key={index} onSelect={() => setSelectedAccount(space.spaceName)}>
+            <MenuOption key={index} onSelect={() => handleSpaceChange(space.spaceName, space.spaceId)}>
               <Text style={{ fontSize: hp(2), fontWeight: 'bold', paddingLeft: wp(2), paddingTop: hp(1) }}>
                 {space.spaceName}
               </Text>

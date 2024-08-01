@@ -3,14 +3,16 @@ import { Alert, Modal, Text, Pressable, View, TextInput, ActivityIndicator } fro
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Checkbox from 'expo-checkbox';
 import { getUsersForSpace } from '../helpers/usersHelper';
+import { useSpace } from '../context/spaceContext';
 
 export default function AddPaidByMembersModal({ modalVisible, setModalVisible, setPaidForMembers }) {
+    const { selectedSpaceId } = useSpace();
     const [loading, setLoading] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [userAmounts, setUserAmounts] = useState({});
     const [users, setUsers] = useState([]);
 
-    const spaceId = "Bodima_9278"
+    const spaceId = selectedSpaceId;
 
     useEffect(()=> {
         const unsubscribe = getUsersForSpace(spaceId, setUsers);

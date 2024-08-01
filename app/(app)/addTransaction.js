@@ -12,10 +12,12 @@ import MemberList from '../../components/MemberList';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { useAuth } from '../../context/authContext';
+import { useSpace } from '../../context/spaceContext';
 
 
 export default function addTransaction() {
   const { user } = useAuth();
+  const { selectedSpaceId } = useSpace();
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [formattedDate, setFormattedDate] = useState(date.toDateString());
@@ -47,6 +49,7 @@ export default function addTransaction() {
 
   const onSubmit = async () => {
     try {
+      console.log()
       // Validate the data
       if (!description || !value || !paidByMembers.length || !paidForMembers.length) {
         Alert.alert("Error", "Please fill all the fields");
@@ -68,20 +71,19 @@ export default function addTransaction() {
         paidBy: paidByMembers,
         paidFor: paidForMembers,
         totalAmount: totalAmount,
-        spaceId: 'Bodima_9278',
+        spaceId: selectedSpaceId,
         createdBy: user?.userId,
         createdAt: new Date(),
         isDeleted: false
       })
       console.log("Document written with ID: ", docRef.id);
+      resetForm();
+      return {success: true};
 
     } catch (error) {
       let msg = error.message;
       return {success: false, msg};
     }
-
-    // Reset form
-    resetForm();
   };
 
   const resetForm = () => {
@@ -217,7 +219,7 @@ export default function addTransaction() {
         </View>
 
         <View className="flex-row w-full justify-between mb-2">
-          <TouchableOpacity style={{backgroundColor:"gray", width: wp(43), height: hp(7), alignItems: "center", justifyContent: "center", borderRadius: 8}}>
+          <TouchableOpacity style={{backgroundColor:"gray", width: wp(43), height: hp(7), alignItems: "center", justifyContent: "center", borderRadius: 8}} onPress={resetForm}>
             <Text className="text-white text-xl font-bold">Reset</Text>
           </TouchableOpacity>
           <TouchableOpacity style={{backgroundColor:"#272727", width: wp(43), height: hp(7), alignItems: "center", justifyContent: "center", borderRadius: 8}} onPress={onSubmit}>
