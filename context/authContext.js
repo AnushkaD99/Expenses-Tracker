@@ -7,13 +7,14 @@ import {
 } from "react";
 import { auth, db } from "../firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({children}) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(undefined);
-
+ 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (user) => {
             if(user) {
@@ -55,6 +56,8 @@ export const AuthContextProvider = ({children}) => {
 
     const logout = async () => {
         try {
+            await AsyncStorage.clear();
+            console.log("cleared");
             await signOut(auth);
             return {success: true};
 

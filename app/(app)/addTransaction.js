@@ -9,7 +9,7 @@ import AddPaidForMembersModal from "../../components/AddPaidForMembersModal"
 import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MemberList from '../../components/MemberList';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { useAuth } from '../../context/authContext';
 import { useSpace } from '../../context/spaceContext';
@@ -73,7 +73,7 @@ export default function addTransaction() {
         totalAmount: totalAmount,
         spaceId: selectedSpaceId,
         createdBy: user?.userId,
-        createdAt: new Date(),
+        createdAt: Timestamp.fromDate(new Date()),
         isDeleted: false
       })
       console.log("Document written with ID: ", docRef.id);
