@@ -31,6 +31,8 @@ export default function CreateSpaceModal({modalVisible, setModalVisible}) {
             await setDoc(doc(db, "userSpaces", `${userId}_${spaceId}`), {
                 userId,
                 spaceId,
+                updatedAt: Timestamp.fromDate(new Date()),
+                totalBalance: 0,
                 isDeleted: false
             });
             return {success: true};

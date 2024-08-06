@@ -39,7 +39,10 @@ export default function JoinSpaceModal({modalVisible, setModalVisible}) {
         const userSpacesRef = collection(db, "userSpaces");
         await addDoc(userSpacesRef, {
             userId,
-            spaceId
+            spaceId,
+            updatedAt: Timestamp.fromDate(new Date()),
+            totalBalance: 0,
+            isDeleted: false
         });
 
         return { success: true };
