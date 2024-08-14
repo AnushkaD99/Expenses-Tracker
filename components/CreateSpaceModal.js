@@ -1,4 +1,4 @@
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import React, { useRef, useState } from 'react'
 import {Alert, Modal, Text, Pressable, View, TextInput, ActivityIndicator} from 'react-native';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';

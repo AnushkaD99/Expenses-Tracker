@@ -76,7 +76,7 @@ export default function addTransaction() {
         createdAt: Timestamp.fromDate(new Date()),
         isDeleted: false
       })
-      console.log("Document written with ID: ", docRef.id);
+      // console.log("Document written with ID: ", docRef.id);
       resetForm();
       return {success: true};
 

@@ -35,3 +35,4 @@ export const getTransactionsBySpaceId = (spaceId, setTransactions) => {
         console.log("Error:", error);
     }
 };
+
