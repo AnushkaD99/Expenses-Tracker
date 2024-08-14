@@ -5,38 +5,41 @@ import {
     onSnapshot,
     increment,
     doc,
-    updateDoc
+    updateDoc,
+    orderBy
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 export const getTransactionsBySpaceId = (spaceId, setTransactions) => {
-    try {
-        const transactionsRef = collection(db, "transactions");
-        const q = query(transactionsRef, where("spaceId", "==", spaceId));
+  try {
+      const transactionsRef = collection(db, "transactions");
 
-        // Corrected the usage of onSnapshot
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const allTransactions = snapshot.docs.map(doc => {
-                const data = doc.data();
+      // Query ordered by createdAt in descending order (most recent first)
+      const q = query(transactionsRef, where("spaceId", "==", spaceId), orderBy("createdAt", "desc"));
 
-                // Convert Firestore Timestamps to ISO string
-                if (data.date && data.date.seconds) {
-                    data.date = new Date(data.date.seconds * 1000).toISOString();
-                }
-                if (data.createdAt && data.createdAt.seconds) {
-                    data.createdAt = new Date(data.createdAt.seconds * 1000).toISOString();
-                }
+      // Corrected the usage of onSnapshot
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+          const allTransactions = snapshot.docs.map(doc => {
+              const data = doc.data();
 
-                return data;
-            });
+              // Convert Firestore Timestamps to ISO string
+              if (data.date && data.date.seconds) {
+                  data.date = new Date(data.date.seconds * 1000).toISOString();
+              }
+              if (data.createdAt && data.createdAt.seconds) {
+                  data.createdAt = new Date(data.createdAt.seconds * 1000).toISOString();
+              }
 
-            setTransactions(allTransactions);
-        });
+              return data;
+          });
 
-        return unsubscribe;
-    } catch (error) {
-        console.log("Error:", error);
-    }
+          setTransactions(allTransactions);
+      });
+
+      return unsubscribe;
+  } catch (error) {
+      console.log("Error:", error);
+  }
 };
 
 // Function to update total balance in userSpaces
