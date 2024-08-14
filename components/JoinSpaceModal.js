@@ -36,8 +36,7 @@ export default function JoinSpaceModal({modalVisible, setModalVisible}) {
         console.log("Space exists and joining key is correct");
 
         // Store the userId and spaceId in the userSpaces collection
-        const userSpacesRef = collection(db, "userSpaces");
-        await addDoc(userSpacesRef, {
+        await setDoc(doc(db, "userSpaces", `${userId}_${spaceId}`), {
             userId,
             spaceId,
             updatedAt: Timestamp.fromDate(new Date()),

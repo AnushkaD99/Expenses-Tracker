@@ -2,7 +2,10 @@ import {
     collection,
     query,
     where,
-    onSnapshot
+    onSnapshot,
+    increment,
+    doc,
+    updateDoc
 } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
@@ -36,3 +39,34 @@ export const getTransactionsBySpaceId = (spaceId, setTransactions) => {
     }
 };
 
+// Function to update total balance in userSpaces
+export const updateTotalBalance = async (paidByMembers, paidForMembers, selectedSpaceId) => {
+    try {
+      // Update balance for members who paid
+      for (const member of paidByMembers) {
+        const { userId, amount } = member;
+        const userSpaceDocRef = doc(db, "userSpaces", `${userId}_${selectedSpaceId}`);
+  
+        // Subtract the paid amount from the totalBalance
+        await updateDoc(userSpaceDocRef, {
+          totalBalance: increment(-parseFloat(amount))
+        });
+      }
+  
+      // Update balance for members who were paid for
+      for (const member of paidForMembers) {
+        const { userId, amount } = member;
+        const userSpaceDocRef = doc(db, "userSpaces", `${userId}_${selectedSpaceId}`);
+  
+        // Add the paidFor amount to the totalBalance
+        await updateDoc(userSpaceDocRef, {
+          totalBalance: increment(parseFloat(amount))
+        });
+      }
+  
+      return { success: true };
+    } catch (error) {
+      console.log("Error updating total balance:", error);
+      return { success: false, msg: error.message };
+    }
+  };

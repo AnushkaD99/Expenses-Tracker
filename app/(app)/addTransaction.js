@@ -13,6 +13,7 @@ import { addDoc, collection, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { useAuth } from '../../context/authContext';
 import { useSpace } from '../../context/spaceContext';
+import { updateTotalBalance } from '../../helpers/transactionsHelper';
 
 
 export default function addTransaction() {
@@ -76,6 +77,16 @@ export default function addTransaction() {
         createdAt: Timestamp.fromDate(new Date()),
         isDeleted: false
       })
+
+      // Update the total balance for each user in userSpaces
+      const balanceUpdateResult = await updateTotalBalance(paidByMembers, paidForMembers, selectedSpaceId);
+
+      if (balanceUpdateResult.success) {
+        console.log("Balances updated successfully");
+      } else {
+        console.log("Failed to update balances:", balanceUpdateResult.msg);
+      }
+
       // console.log("Document written with ID: ", docRef.id);
       resetForm();
       return {success: true};
