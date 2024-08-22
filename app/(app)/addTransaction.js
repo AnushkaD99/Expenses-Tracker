@@ -145,7 +145,7 @@ export default function addTransaction() {
 
   return (
     <SafeAreaView className="flex-1">
-      <ScrollView style={{paddingVertical: hp(2), paddingHorizontal: wp(5)}}>
+      <ScrollView contentContainerStyle={{paddingVertical: hp(2), paddingHorizontal: wp(5)}}>
         <View className="flex-1 gap-5">
           <View className="flex-col gap-0">
             <Text className="text-left text-lg font-semibold">Date :</Text>
