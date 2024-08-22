@@ -202,9 +202,9 @@ export default function addTransaction() {
               onChange={item => {
                 setValue(item.value);
               }}
-              renderLeftIcon={() => (
-                <AntDesign color="black" name="Safety" size={20} />
-              )}
+              // renderLeftIcon={() => (
+              //   <AntDesign color="black" name="Safety" size={20} />
+              // )}
               renderItem={renderItem}
             />
           </View>
