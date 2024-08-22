@@ -56,6 +56,17 @@ export default function _layout() {
           },
         }}
       />
+      <Tabs.Screen
+        name='allTransactions'
+        options={{
+          tabBarIcon: ({ color, size }) => (<FontAwesome5 name="people-arrows" size={size} color={color} />),
+          title: 'Transactions',
+          tabBarLabelStyle: {
+            fontSize: hp(1.6),
+            fontWeight: 'bold'
+          },
+        }}
+      />
     </Tabs>
   )
 }
