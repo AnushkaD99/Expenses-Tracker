@@ -67,6 +67,17 @@ export default function _layout() {
           },
         }}
       />
+      <Tabs.Screen
+        name='profile'
+        options={{
+          tabBarIcon: ({ color, size }) => (<FontAwesome5 name="user-alt" size={size} color={color} />),
+          title: 'Profile',
+          tabBarLabelStyle: {
+            fontSize: hp(1.6),
+            fontWeight: 'bold'
+          },
+        }}
+      />
     </Tabs>
   )
 }
