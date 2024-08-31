@@ -43,7 +43,7 @@ export default function HomeHeaderLeft() {
             <MaterialIcons name="arrow-drop-down" size={24} color="black" />
           </View>
         </MenuTrigger>
-        <MenuOptions>
+        <MenuOptions style={{paddingBottom: hp(1.5)}}>
           {spaces.map((space, index) => (
             <MenuOption key={index} onSelect={() => handleSpaceChange(space.spaceName, space.spaceId)}>
               <Text style={{ fontSize: hp(2), fontWeight: 'bold', paddingLeft: wp(2), paddingTop: hp(1) }}>

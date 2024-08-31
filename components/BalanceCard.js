@@ -5,47 +5,65 @@ import { useAuth } from '../context/authContext';
 import { useSpace } from '../context/spaceContext';
 import { db } from '../firebaseConfig';
 import { onSnapshot, doc } from 'firebase/firestore';
+import { getSpacesForUser } from '../helpers/spacesHelper';
 
 export default function BalanceCard() {
   const { user } = useAuth();
   const { selectedSpaceId } = useSpace();
-  
   const [totalBalance, setTotalBalance] = useState(null);
+  const [spaces, setSpaces] = useState([]);
+
+  useEffect(() => {
+    if (user?.userId) {
+      // Assuming `getSpacesForUser` is a function that fetches spaces for a user
+      const unsubscribe = getSpacesForUser(user?.userId, setSpaces);
+      return unsubscribe;
+    }
+  }, [user?.userId]);
 
   useEffect(() => {
     if (user?.userId && selectedSpaceId) {
-      // Create a reference to the user's balance in the userSpaces collection
       const userSpaceDocRef = doc(db, "userSpaces", `${user.userId}_${selectedSpaceId}`);
 
-      // Set up a listener for real-time updates
       const unsubscribe = onSnapshot(userSpaceDocRef, (docSnapshot) => {
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
-          setTotalBalance(data.totalBalance); // Update the total balance in state
+          setTotalBalance(data.totalBalance);
         } else {
           console.log("No such document!");
         }
       });
 
-      // Clean up the listener when the component unmounts or dependencies change
       return () => unsubscribe();
     }
   }, [user?.userId, selectedSpaceId]);
 
   return (
     <View style={{ paddingVertical: hp(4), paddingHorizontal: wp(5) }} className="w-full bg-neutral-200 flex-col justify-center items-center rounded-xl gap-2">
-      <Text className="text-black text-lg font-semibold">Total Balance</Text>
-      <View className="flex-col items-center justify-center">
-        <Text
-          className="text-3xl font-bold"
-          style={{
-            color: totalBalance !== null && totalBalance < 0 ? 'red' : 'green',
-          }}
-        >
-          {totalBalance !== null ? `${totalBalance} LKR` : "Loading..."}
-        </Text>
-      </View>
+      {spaces.length ? (
+        <>
+          <Text style={{ color: '#000', fontSize: wp(4), fontWeight: '600' }}>Total Balance</Text>
+          <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <Text
+              style={{
+                fontSize: wp(8),
+                fontWeight: 'bold',
+                color: totalBalance !== null && totalBalance < 0 ? 'red' : 'green',
+              }}
+            >
+              {totalBalance !== null ? `${totalBalance} LKR` : "Loading..."}
+            </Text>
+          </View>
+        </>
+      ) : (
+        <View>
+          <Text style={{
+                fontSize: wp(4),
+                fontWeight: 'bold',
+                color: 'red',
+              }}>Please Add or Create Space to Use the Expense Manager.</Text>
+        </View>
+      )}
     </View>
   );
-  
 }

@@ -35,10 +35,10 @@ export default function _layout() {
         }}
       />
       <Tabs.Screen
-        name='addTransaction'
+        name='space'
         options={{
-          tabBarIcon: ({ color, size }) => (<FontAwesome5 name="plus-circle" size={size} color={color} />),
-          title: 'Add Transacrtion',
+          tabBarIcon: ({ color, size }) => (<FontAwesome5 name="wallet" size={size} color={color} />),
+          title: 'Spaces',
           tabBarLabelStyle: {
             fontSize: hp(1.6),
             fontWeight: 'bold'
@@ -46,10 +46,10 @@ export default function _layout() {
         }}
       />
       <Tabs.Screen
-        name='space'
+        name='addTransaction'
         options={{
-          tabBarIcon: ({ color, size }) => (<FontAwesome5 name="wallet" size={size} color={color} />),
-          title: 'Spaces',
+          tabBarIcon: ({ color, size }) => (<FontAwesome5 name="plus-circle" size={size} color={color} />),
+          title: 'Add Transacrtion',
           tabBarLabelStyle: {
             fontSize: hp(1.6),
             fontWeight: 'bold'

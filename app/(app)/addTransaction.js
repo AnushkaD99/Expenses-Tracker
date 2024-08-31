@@ -1,12 +1,10 @@
-import { View, Text, TextInput, Pressable, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import { View, Text, TextInput, Pressable, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import DateTimePicker from "@react-native-community/datetimepicker";
-import AddPaidByMembersModal from "../../components/AddPaidByMembersModal"
-import AddPaidForMembersModal from "../../components/AddPaidForMembersModal"
-
-
-import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
+import AddPaidByMembersModal from "../../components/AddPaidByMembersModal";
+import AddPaidForMembersModal from "../../components/AddPaidForMembersModal";
+import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MemberList from '../../components/MemberList';
 import { addDoc, collection, Timestamp } from 'firebase/firestore';
@@ -15,21 +13,19 @@ import { useAuth } from '../../context/authContext';
 import { useSpace } from '../../context/spaceContext';
 import { updateTotalBalance } from '../../helpers/transactionsHelper';
 
-
-export default function addTransaction() {
+export default function AddTransaction() {
   const { user } = useAuth();
   const { selectedSpaceId } = useSpace();
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [formattedDate, setFormattedDate] = useState(date.toDateString());
   const [value, setValue] = useState(null);
-  const [selected, setSelected] = useState([]);
-  const [addPaidByMembersModalVisible, setAddPaidByMembersModalVisible] = useState(false);
-  const [addPaidForMembersModalVisible, setAddPaidForMembersModalVisible] = useState(false);
   const [paidByMembers, setPaidByMembers] = useState([]);
   const [paidForMembers, setPaidForMembers] = useState([]);
-  const [totalAmount, setTotalAmount] = useState();
+  const [totalAmount, setTotalAmount] = useState(0);
   const [description, setDescription] = useState("");
+  const [addPaidByMembersModalVisible, setAddPaidByMembersModalVisible] = useState(false);
+  const [addPaidForMembersModalVisible, setAddPaidForMembersModalVisible] = useState(false);
 
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
@@ -44,14 +40,13 @@ export default function addTransaction() {
 
   const calculateTotalAmount = (members) => {
     return members.reduce((total, member) => {
-      return total + parseFloat(member.amount);
+      const amount = parseFloat(member.amount) || 0;
+      return total + amount;
     }, 0);
   };
 
   const onSubmit = async () => {
     try {
-      console.log()
-      // Validate the data
       if (!description || !value || !paidByMembers.length || !paidForMembers.length) {
         Alert.alert("Error", "Please fill all the fields");
         return;
@@ -59,26 +54,24 @@ export default function addTransaction() {
 
       const paidForTotalAmount = calculateTotalAmount(paidForMembers);
 
-      if(totalAmount != paidForTotalAmount) {
+      if (totalAmount !== paidForTotalAmount) {
         Alert.alert("Error", "Total Amount doesn't match. Please check!");
         return;
       }
 
-      // Handle the data
-      const docRef = await addDoc(collection(db, "transactions"),{
-        date: date,
-        description: description,
+      await addDoc(collection(db, "transactions"), {
+        date: Timestamp.fromDate(date),
+        description,
         category: value,
         paidBy: paidByMembers,
         paidFor: paidForMembers,
-        totalAmount: totalAmount,
+        totalAmount,
         spaceId: selectedSpaceId,
         createdBy: user?.userId,
         createdAt: Timestamp.fromDate(new Date()),
-        isDeleted: false
-      })
+        isDeleted: false,
+      });
 
-      // Update the total balance for each user in userSpaces
       const balanceUpdateResult = await updateTotalBalance(paidByMembers, paidForMembers, selectedSpaceId);
 
       if (balanceUpdateResult.success) {
@@ -87,13 +80,9 @@ export default function addTransaction() {
         console.log("Failed to update balances:", balanceUpdateResult.msg);
       }
 
-      // console.log("Document written with ID: ", docRef.id);
       resetForm();
-      return {success: true};
-
     } catch (error) {
-      let msg = error.message;
-      return {success: false, msg};
+      Alert.alert("Error", `Failed to add transaction: ${error.message}`);
     }
   };
 
@@ -102,89 +91,63 @@ export default function addTransaction() {
     setShowPicker(false);
     setFormattedDate(new Date().toDateString());
     setValue(null);
-    setSelected([]);
     setPaidByMembers([]);
     setPaidForMembers([]);
-    setTotalAmount(null);
+    setTotalAmount(0);
     setDescription("");
   };
-  
+
   useEffect(() => {
     if (paidByMembers.length) {
       const total = calculateTotalAmount(paidByMembers);
       setTotalAmount(total);
     }
-  }, [paidByMembers]);  
+  }, [paidByMembers]);
 
   const data = [
-    { label: 'Item 1', value: '1' },
-    { label: 'Item 2', value: '2' },
-    { label: 'Item 3', value: '3' },
-    { label: 'Item 4', value: '4' },
-    { label: 'Item 5', value: '5' },
-    { label: 'Item 6', value: '6' },
-    { label: 'Item 7', value: '7' },
-    { label: 'Item 8', value: '8' },
+    { label: 'Food', value: 'Food' },
+    { label: 'Transpotation', value: 'Transpotation' },
+    { label: 'Housing', value: 'Housing' },
+    { label: 'Health Care', value: 'Health Care' },
+    { label: 'Utilities', value: 'Utilities' },
+    { label: 'Other', value: 'Other' },
   ];
 
-  const renderItem = item => {
-    return (
-      <View style={styles.item}>
-        <Text style={styles.textItem}>{item.label}</Text>
-        {item.value === value && (
-          <AntDesign
-            style={styles.icon}
-            color="black"
-            name="Safety"
-            size={20}
-          />
-        )}
-      </View>
-    );
-  };
+  const renderItem = item => (
+    <View style={styles.item}>
+      <Text style={styles.textItem}>{item.label}</Text>
+      {item.value === value && (
+        <AntDesign style={styles.icon} color="black" name="Safety" size={20} />
+      )}
+    </View>
+  );
 
   return (
-    <SafeAreaView className="flex-1">
-      <ScrollView contentContainerStyle={{paddingVertical: hp(2), paddingHorizontal: wp(5)}}>
-        <View className="flex-1 gap-5">
-          <View className="flex-col gap-0">
-            <Text className="text-left text-lg font-semibold">Date :</Text>
-              {showPicker && (
-                <DateTimePicker
-                  mode="date"
-                  display="spinner"
-                  value={date}
-                  onChange={onDateChange}
-                />
-              )}
-              <View style={{height: hp(7)}}>
-                <Pressable onPress={toggleDatePicker} className="flex-1 justify-center px-4 bg-white rounded-xl w-full">
-                  <TextInput
-                    classname="font-semibold text-neutral-700"
-                    placeholder="Select date"
-                    value={formattedDate}
-                    editable={false}
-                  />
-                </Pressable>
-              </View>
-          </View>
-
-          <View className="flex-col gap-0">
-            <Text className="text-left text-lg font-semibold">Description :</Text>
-            <View style={{height: hp(7)}}>
-              <TextInput
-                  onChangeText={(e) => setDescription(e)}
-                  style={{fontSize: hp(2)}}
-                  className="flex-1 font-semibold text-neutral-700  px-4 bg-white items-center rounded-xl w-full"
-                  placeholder='Enter Description'
-                  placeholderTextColor={'gray'}
-                  value={description}
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.formContainer}>
+          <View style={styles.datePickerContainer}>
+            <Text style={styles.label}>Date:</Text>
+            {showPicker && (
+              <DateTimePicker
+                mode="date"
+                display="spinner"
+                value={date}
+                onChange={onDateChange}
               />
-            </View>
+            )}
+            <Pressable onPress={toggleDatePicker} style={styles.dateInputContainer}>
+              <TextInput
+                style={styles.dateInput}
+                placeholder="Select date"
+                value={formattedDate}
+                editable={false}
+              />
+            </Pressable>
           </View>
 
-          <View className="flex-col gap-0">
-            <Text className="text-left text-lg font-semibold">Category :</Text>
+          <View style={styles.categoryContainer}>
+            <Text style={styles.label}>Category:</Text>
             <Dropdown
               style={styles.dropdown}
               placeholderStyle={styles.placeholderStyle}
@@ -199,79 +162,116 @@ export default function addTransaction() {
               placeholder="Select Category"
               searchPlaceholder="Search..."
               value={value}
-              onChange={item => {
-                setValue(item.value);
-              }}
-              // renderLeftIcon={() => (
-              //   <AntDesign color="black" name="Safety" size={20} />
-              // )}
+              onChange={item => setValue(item.value)}
               renderItem={renderItem}
             />
           </View>
 
-          <View className="flex-row justify-between items-center">
-            <Text className="text-left text-lg font-semibold">Paid by :</Text>
-            <Pressable style={{height: hp(5), width: wp(35)}} className="justify-center bg-neutral-500 items-center rounded-xl" onPress={() => setAddPaidByMembersModalVisible(true)}>
-              <Text className="text-white font-semibold text-lg">Select Member</Text>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.label}>Description:</Text>
+            <TextInput
+              onChangeText={setDescription}
+              style={styles.input}
+              placeholder='Enter Description'
+              placeholderTextColor='gray'
+              value={description}
+            />
+          </View>
+
+          <View style={styles.selectorContainer}>
+            <Text style={styles.label}>Paid by:</Text>
+            <Pressable style={styles.button} onPress={() => setAddPaidByMembersModalVisible(true)}>
+              <Text style={styles.buttonText}>Select Member</Text>
             </Pressable>
           </View>
           <MemberList members={paidByMembers} />
 
-          {paidByMembers.length ? <Text className="text-xl font-semibold text-center">Full Amount : {totalAmount}</Text> : null}
+          {paidByMembers.length ? <Text style={styles.totalAmount}>Full Amount: {totalAmount}</Text> : null}
 
-
-          <View className="flex-row justify-between items-center">
-            <Text className="text-left text-lg font-semibold">Paid for :</Text>
-            <Pressable style={{height: hp(5), width: wp(35)}} className="justify-center bg-neutral-500 items-center rounded-xl" onPress={() => setAddPaidForMembersModalVisible(true)}>
-              <Text className="text-white font-semibold text-lg">Select Member</Text>
+          <View style={styles.selectorContainer}>
+            <Text style={styles.label}>Paid for:</Text>
+            <Pressable style={styles.button} onPress={() => setAddPaidForMembersModalVisible(true)}>
+              <Text style={styles.buttonText}>Select Member</Text>
             </Pressable>
           </View>
           <MemberList members={paidForMembers} />
-        </View>
 
-        <View className="flex-row w-full justify-between mb-2">
-          <TouchableOpacity style={{backgroundColor:"gray", width: wp(43), height: hp(7), alignItems: "center", justifyContent: "center", borderRadius: 8}} onPress={resetForm}>
-            <Text className="text-white text-xl font-bold">Reset</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{backgroundColor:"#272727", width: wp(43), height: hp(7), alignItems: "center", justifyContent: "center", borderRadius: 8}} onPress={onSubmit}>
-            <Text className="text-white text-xl font-bold">Add</Text>
-          </TouchableOpacity>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity style={styles.resetButton} onPress={resetForm}>
+              <Text style={styles.buttonText}>Reset</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
+              <Text style={styles.buttonText}>Add</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
-      <AddPaidByMembersModal modalVisible={addPaidByMembersModalVisible} setModalVisible={setAddPaidByMembersModalVisible} setPaidByMembers={setPaidByMembers}/>
-      <AddPaidForMembersModal modalVisible={addPaidForMembersModalVisible} setModalVisible={setAddPaidForMembersModalVisible} setPaidForMembers={setPaidForMembers}/>
+      <AddPaidByMembersModal modalVisible={addPaidByMembersModalVisible} setModalVisible={setAddPaidByMembersModalVisible} setPaidByMembers={setPaidByMembers} />
+      <AddPaidForMembersModal modalVisible={addPaidForMembersModalVisible} setModalVisible={setAddPaidForMembersModalVisible} setPaidForMembers={setPaidForMembers} />
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-  dropdown: {
-    height: hp(7),
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 12,
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 1,
-    // },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 1.41,
-
-    // elevation: 2,
+  container: {
+    flex: 1,
   },
-  icon: {
-    marginRight: 5,
+  scrollContainer: {
+    paddingVertical: hp(2),
+    paddingHorizontal: wp(5),
   },
-  item: {
-    padding: 17,
+  formContainer: {
+    flex: 1,
+    gap: hp(2),
+  },
+  datePickerContainer: {
+    flexDirection: 'column',
+    gap: hp(1),
+  },
+  descriptionContainer: {
+    flexDirection: 'column',
+    gap: hp(1),
+  },
+  categoryContainer: {
+    flexDirection: 'column',
+    gap: hp(1),
+  },
+  selectorContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  textItem: {
-    flex: 1,
-    fontSize: 16,
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: hp(2),
+  },
+  dateInputContainer: {
+    height: hp(7),
+    backgroundColor: 'white',
+    borderRadius: 12,
+    justifyContent: 'center',
+    paddingHorizontal: wp(4),
+  },
+  dateInput: {
+    fontSize: hp(2),
+    fontWeight: '600',
+    color: 'black',
+  },
+  input: {
+    fontSize: hp(2),
+    fontWeight: '600',
+    color: 'black',
+    paddingHorizontal: wp(4),
+    backgroundColor: 'white',
+    borderRadius: 12,
+    height: hp(7),
+  },
+  dropdown: {
+    height: hp(7),
+    backgroundColor: 'white',
+    borderRadius: 12,
+    paddingHorizontal: wp(3),
   },
   placeholderStyle: {
     fontSize: 16,
@@ -287,7 +287,54 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-  selectedStyle: {
+  button: {
+    height: hp(5),
+    width: wp(35),
+    backgroundColor: '#505050',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 12,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  resetButton: {
+    backgroundColor: 'gray',
+    width: wp(43),
+    height: hp(7),
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  submitButton: {
+    backgroundColor: '#272727',
+    width: wp(43),
+    height: hp(7),
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  totalAmount: {
+    fontSize: hp(2.2),
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  label: {
+    fontSize: hp(2),
+    fontWeight: '600',
+  },
+  item: {
+    padding: 17,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  textItem: {
+    fontSize: 16,
+  },
+  icon: {
+    marginRight: 5,
   },
 });

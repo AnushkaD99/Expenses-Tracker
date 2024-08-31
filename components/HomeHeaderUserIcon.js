@@ -25,7 +25,7 @@ export default function HomeHeaderUserIcon() {
         <MenuTrigger>
           <FontAwesome6 name="user-circle" size={hp(4)} color="black" />
         </MenuTrigger>
-        <MenuOptions>
+        <MenuOptions style={{paddingVertical: hp(1), paddingHorizontal: wp(1)}}>
           <MenuOption onSelect={() => router.push('profile')}>
             <Text className="text-xl font-semibold pt-1 pl-2">Profile</Text>
           </MenuOption>
