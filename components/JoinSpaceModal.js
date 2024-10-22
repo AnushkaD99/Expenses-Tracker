@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import {Alert, Modal, Text, Pressable, View, TextInput, ActivityIndicator} from 'react-native';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useAuth } from '../context/authContext';
-import { addDoc, collection, doc, getDoc, query, setDoc, Timestamp, where } from 'firebase/firestore';
+import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 export default function JoinSpaceModal({modalVisible, setModalVisible}) {
